@@ -1,0 +1,98 @@
+# Pacotes utilizados
+
+library(tidyverse)
+library(dplyr)
+library(fdth)
+library(ggplot2)
+library(forecast)
+library(MLmetrics)
+
+# Conjunto de dados carregados para o teste
+
+ocorrencia <- read.csv('ocorrencia.csv', sep =';')
+
+as.Date("03/08/2017", format = "%d/%m/%Y")
+
+ocorrencia$ocorrencia_dia
+
+names(ocorrencia)
+
+ocorrencia$ocorrencia_dia <- as.Date(ocorrencia$ocorrencia_dia, format = "%d/%m/%Y")
+
+filther = ocorrencia %>% filter( ocorrencia_classificacao == 'ACIDENTE'  )
+
+view(filther)
+
+data_acid <- filther$ocorrencia_dia
+
+acid_mes_ano <- format( data_acid, "%y/%m")
+
+tb <- table(acid_mes_ano)
+
+ts_acid <- ts( tb, start = c(2012,1), frequency = 12)
+
+ts.plot(ts_acid, xlab = 'Tempo (ano)', ylab='Ocorrência de acidentes',
+        main = 'Série temporal de ocorrências CENIPA')
+
+mod <- auto.arima(ts_acid ,seasonal = TRUE, approximation = FALSE)
+
+res <- mod$residuals
+
+acf(res)
+
+hist(res)
+
+shapiro.test(res)
+
+# Calculando o gráfico de envelope para distribuição normal 
+
+n <- length(res)
+xb <- mean(res) # mu
+sx <- sd(res) # sigma
+
+## 2. Gráfico QQ com envelope
+nsim <- 100 # Número de simulações
+conf <- 0.95 # Coef. de confiança
+# Dados simulados ~ normal
+dadossim <- matrix(rnorm(n * nsim, mean = xb, sd = sx), nrow = n)
+dadossim <- apply(dadossim, 2, sort)
+# Limites da banda e média
+infsup <- apply(dadossim, 1, quantile, probs = c((1 - conf) / 2,
+                                                 (1 + conf) / 2))
+xbsim <- rowMeans(dadossim)
+# Gráfico
+faixay <- range(res, dadossim)
+qq0 <- qqnorm(res, main = "", xlab = "Quantis teóricos N(0,1)", pch = 20,
+              ylab = "Ocorrência CENIPA", ylim = faixay)
+eixox <- sort(qq0$x)
+lines(eixox, xbsim)
+lines(eixox, infsup[1,])
+lines(eixox, infsup[2,])
+
+prev = forecast(mod, 2)
+
+plot(prev, main = 'Previsão para ocorrências 2022', xlab = 'Tempo (mês)'
+    , ylab = 'Contagem' )
+
+
+
+fig <- plot_ly(type = 'scatter', mode = 'lines')%>%
+  add_trace(x = ~acid_mes_ano, y = ~tb, name = 'GOOG')%>%
+  layout(showlegend = F)
+options(warn = -1)
+
+fig <- fig %>%
+  layout(
+    xaxis = list(zerolinecolor = '#ffff',
+                 zerolinewidth = 2,
+                 gridcolor = 'ffff'),
+    yaxis = list(zerolinecolor = '#ffff',
+                 zerolinewidth = 2,
+                 gridcolor = 'ffff'),
+    plot_bgcolor='#e5ecf6', width = 900)
+
+
+fig
+
+
+acid_mes_ano

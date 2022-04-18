@@ -1,0 +1,14 @@
+name: A3data
+title: A3data
+username:
+account: gx1jfd-caio-balieiro
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6105617
+bundleId: 5806078
+url: https://gx1jfd-caio-balieiro.shinyapps.io/A3data/
+when: 1650167218.70289
+lastSyncTime: 1650167218.70292
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .ipynb_checkpoints/acidentes_aereos-checkpoint.ipynb|.ipynb_checkpoints/Cod_Desafio-checkpoint.ipynb|acidentes_aereos.ipynb|aeronave.csv|Cod_Desafio.ipynb|Codigo_aux.R|dados.csv|desafio_tcnico_cd_-_a3data.pdf|desafio_tecnico.pdf|desafio_tecnico.Rmd|fator_contribuinte.csv|img/image1.png|ocorrencia_tipo.csv|recomendacao.csv|Serie_Acidente.R
